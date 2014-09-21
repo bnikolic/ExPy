@@ -4,11 +4,9 @@
 
 """
 
-import __main__
 import types
 import ctypes
 import xlltypes
-import ExNumPy
 
 fnregstry = {}
 
