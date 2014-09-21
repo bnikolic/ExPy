@@ -5,6 +5,8 @@
   
 */
 
+#include "chutils.h"
+
 #include <assert.h>
 #include <windows.h>
 #include <stdio.h>
@@ -14,34 +16,19 @@
 
 #include "xlcall.h"
 
-void SystemError(int error, char *msg)
+void msgBox(const char *msg)
 {
-	char Buffer[1024];
-	int n;
-
-	if (error) {
-		LPVOID lpMsgBuf;
-		FormatMessage( 
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-			FORMAT_MESSAGE_FROM_SYSTEM,
-			NULL,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPSTR)&lpMsgBuf,
-			0,
-			NULL 
-			);
-		strncpy(Buffer, lpMsgBuf, sizeof(Buffer));
-		LocalFree(lpMsgBuf);
-	} else
-		Buffer[0] = '\0';
-	n = lstrlen(Buffer);
-	_snprintf(Buffer+n, sizeof(Buffer)-n, msg);
-	MessageBox(GetFocus(), Buffer, NULL, MB_OK | MB_ICONSTOP);
+	MessageBox(GetFocus(), 
+		   msg, 
+		   NULL, 
+		   MB_OK | MB_ICONSTOP);
 }
 
+void (*C_panic_hook) (const char *msg) = msgBox;
 
-static char* expy_funcs[2][7] = {
+#define EXPY_NFUNC 2
+
+static char* expy_funcs[EXPY_NFUNC][7] = {
   {"ExPyEvalSS",  "CC#",    "ExPyEvalSS"},
   {"ExPyScript",  "CC#",    "ExPyScript"}
 };
@@ -76,14 +63,16 @@ __declspec(dllexport) int __stdcall xlAutoOpen(void)
   static XLOPER xRegister;
   xRegister.xltype = xltypeStr;
   
-  for (i=0; i<2; i++)
+  for (i=0; i<EXPY_NFUNC; ++i)
   {
             XLOPER* fn = new_xlstring(expy_funcs[i][0]);
             XLOPER* ret = new_xlstring(expy_funcs[i][1]);
             XLOPER* alias = new_xlstring(expy_funcs[i][2]);
             BOOL success = Excel4(xlfRegister, 0, 4, &xDLL, fn, ret, alias) == xlretSuccess;
+	    if (!success)
+	      msgBox("Failed to register function");
             free(fn); free(ret); free(alias);
-        }
+  }
 
     /* Free the XLL filename */
     Excel4(xlFree, 0, 1, &xDLL);
@@ -123,7 +112,7 @@ __declspec(dllexport) __stdcall char * _ExPyEval(const char *cmd, int stoken)
   } 
   else 
   {
-    SystemError(1, "could not import __main__");
+    msgBox("Could not import __main__");
   }
   return NULL;
 
@@ -168,11 +157,8 @@ __declspec(dllexport) __stdcall LPXLOPER ExPyDispatch(LPXLOPER p1,
   }
   else
   {
-     MessageBox(GetFocus(), 
-		"This function can only be called from the spreadsheet" ,  
-		"Error ", 
-		MB_OK | MB_ICONSTOP);
-     return NULL;
+    msgBox("This function can only be called from the spreadsheet");
+    return NULL;
   }
   
 
