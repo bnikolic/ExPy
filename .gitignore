@@ -1,3 +1,4 @@
 /cbits/Makefile~
 /cbits/*.dll
 /cbits/*.o
+/cbits/expy.xll
