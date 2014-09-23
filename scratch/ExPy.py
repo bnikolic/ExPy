@@ -11,7 +11,9 @@ import xlltypes
 
 fnregstry = {}
 
-#This is the list of all results
+# This is the list of all results, used to prevent garbage collection
+# of results passed back to Excel. This will eventually cause memory
+# problems. See github issue #2
 reslist = []
 
 def Splash():
