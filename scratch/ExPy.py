@@ -1,7 +1,7 @@
 # Copyright (c) Bojan Nikolic <bojan@bnikolic.co.uk> 2010, 2013
 # License: See the LICENSE file distributed with this git repository
 """
-
+Registration of functions with Excel and their dispatch back into Python
 """
 
 import __main__
@@ -9,6 +9,7 @@ import types
 import ctypes
 import xlltypes
 
+# Holds ancillary data about all registred functions
 fnregstry = {}
 
 # This is the list of all results, used to prevent garbage collection
