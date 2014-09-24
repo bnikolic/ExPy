@@ -9,7 +9,7 @@ import types
 import ctypes
 import xlltypes
 
-__version__ = 0.4
+__version__ = "0.4"
 
 # Holds ancillary data about all registred functions
 fnregstry = {}
@@ -113,7 +113,7 @@ def Splash():
     blurb= """
     This is the ExPy Python add-in for Microsoft Excel 
 
-    Version: %g
+    Version: %s
 
     Visit us at: http://www.bnikolic.co.uk/expy
     Inquiries/bug reports to: webs@bnikolic.co.uk
