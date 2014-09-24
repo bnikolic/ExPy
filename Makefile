@@ -5,12 +5,16 @@
 # 
 # Top-level makefile for ExPy
 
-default: ExPy.zip
+GITREV := $(shell git describe --dirty)
 
-PYFILES= ExPy/ExPy.py ExPy/xlltypes.py
-XLLFILES= cbits/expy.xll
+PACK := ExPy-${GITREV}.zip
 
-ExPy.zip: ${XLLFILES} ${PYFILES}
+default: ${PACK}
+
+PYFILES  := ExPy/ExPy.py ExPy/xlltypes.py
+XLLFILES := cbits/expy.xll
+
+${PACK}: ${XLLFILES} ${PYFILES}
 	cd cbits && $(MAKE)
-	rm -f ExPy.zip
-	zip ExPy.zip -j ${XLLFILES} ${PYFILES}
+	rm -f $@
+	zip $@ -j ${XLLFILES} ${PYFILES}

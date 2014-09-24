@@ -2,5 +2,5 @@
 /cbits/*.dll
 /cbits/*.o
 /cbits/expy.xll
-/ExPy.zip
 /Makefile~
+/*.zip
