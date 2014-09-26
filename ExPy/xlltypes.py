@@ -5,7 +5,7 @@ Definition of types for interaction with excel
 """
 
 import ctypes
-#import numpy
+import numpy
 
 class XLRef(ctypes.Structure):
     _fields_=[("rwFirst", ctypes.c_int16),
