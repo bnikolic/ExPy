@@ -16,6 +16,10 @@
 
 #include "xlcall.h"
 
+__declspec(dllexport) __stdcall char * _ExPyEval(const char *cmd, int stoken);
+// Add a path to the Python load path
+void addToPath(char *s);
+
 void msgBox(const char *msg)
 {
 	MessageBox(GetFocus(), 
@@ -52,6 +56,15 @@ XLOPER* new_xlstring(const char* text)
     return x;
 }
 
+char * xl2str(const XLOPER *xl)
+{
+  const char *xlstr=  C_CHECK(xl, xl->xltype==xltypeStr, C_VAL1(xl)->val.str);
+  char *res=malloc(sizeof(char) * xlstr[0]);
+  if (res)
+    memcpy(res, xlstr+1, xlstr[0]);
+  return res;
+}
+
 __declspec(dllexport) int __stdcall xlAutoOpen(void)
 {
 
@@ -60,6 +73,11 @@ __declspec(dllexport) int __stdcall xlAutoOpen(void)
   int i;
 
   Excel4(xlGetName, &xDLL, 0);
+
+  char *dllName=xl2str(&xDLL);
+  HMODULE dllh=GetModuleHandle(dllName);
+
+
   static XLOPER xRegister;
   xRegister.xltype = xltypeStr;
   
@@ -79,8 +97,29 @@ __declspec(dllexport) int __stdcall xlAutoOpen(void)
 
     Py_Initialize();
 
+    /* Add path of the Dll to Pythons sys.path */
+    addToPath(dllName);
+
+    /* Load ExPy */
+    _ExPyEval("import ExPy;", 256);
+
+    free(dllName);
+
     return 1;
 
+}
+
+void addToPath(char *s)
+{
+  PyObject *mo = PyImport_ImportModule("os.path");
+  PyObject *fd = PyObject_GetAttrString(mo, "dirname");
+  
+  PyObject *ss= PyObject_CallFunction(fd, "s", s);
+
+  PyObject *ms = PyImport_ImportModule("sys");
+  PyObject *sp = PyObject_GetAttrString(ms, "path");
+  PyList_Append(C_CHECK( sp, PyList_Check(C_VAL1(sp)), C_VAL1(sp)),
+		ss);
 }
 
 __declspec(dllexport) __stdcall char * _ExPyEval(const char *cmd, int stoken)
