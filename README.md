@@ -27,6 +27,25 @@ Alternatives ways of interfacing are via COM (e.g., excelpython,
 https://github.com/ericremoreynolds/excelpython ) or client/server
 architectures (e.g., I believe xlloop).
 
+Installation - Binaries
+-----------------------
+
+Binaries only work against Python 2.7.x versions 32bit and Excel 32
+bit.
+
+1. Ensure you have installed Python version 2.7.x and it is in the
+   PATH environment variable. The recommended way of doing this is by
+   installing the Anaconda distribution: http://continuum.io/downloads
+
+2. Unpack the zip file
+
+3. Open the expy.xll file and confirm you want to give it privileges
+   to run
+
+
+
+
+
 
 
 
